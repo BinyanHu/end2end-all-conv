@@ -97,6 +97,12 @@ def sample_patches(img, roi_mask, out_dir, img_id, abn_id, pos, patch_size=256,
         else:
             roi_out = os.path.join(out_dir, mass_neg_dir)
     bkg_out = os.path.join(out_dir, bkg_dir)
+
+    if not os.path.exists(roi_out):
+        os.mkdir(roi_out)
+    if not os.path.exists(bkg_out):
+        os.mkdir(bkg_out)
+
     basename = '_'.join([img_id, str(abn_id)])
 
     img = add_img_margins(img, patch_size/2)
@@ -301,6 +307,11 @@ def run(description_path, roi_mask_dir, image_dir,
     print "==="
     sys.stdout.flush()
 
+    if not os.path.exists(train_out_dir):
+        os.makedirs(train_out_dir)
+    if not os.path.exists(val_out_dir):
+        os.makedirs(val_out_dir)
+
     # Read ROI mask table with pathology.
     description_df = pd.read_csv(description_path, header=0)
     patient_ids = description_df["patient_id"]
@@ -344,16 +355,12 @@ def run(description_path, roi_mask_dir, image_dir,
         else:
             locs = description_df.index.get_loc(pat_val[0])
             val_df = description_df.iloc[locs]
-        if not os.path.exists(val_out_dir):
-            os.makedirs(val_out_dir)
         write_pat_list(os.path.join(val_out_dir, 'pat_lst.txt'), pat_val.tolist())
     if len(patient_ids) > 1:
         train_df = description_df.loc[patient_ids.tolist()]
     else:
         locs = description_df.index.get_loc(patient_ids[0])
         train_df = description_df.iloc[locs]
-    if not os.path.exists(train_out_dir):
-        os.makedirs(train_out_dir)
     write_pat_list(os.path.join(train_out_dir, 'pat_lst.txt'), patient_ids.tolist())
     # Create a blob detector.
     blob_detector = create_blob_detector(roi_size=(patch_size, patch_size))

@@ -3,15 +3,14 @@
 TRAIN_DIR="INbreast/train_dat_mod/train"
 VAL_DIR="INbreast/train_dat_mod/test"
 TEST_DIR="INbreast/train_dat_mod/val"
-# PATCH_STATE="CBIS-DDSM/Combined_patches_im1152_224_s10/vgg16_prt_best1.h5"
-RESUME_FROM="CBIS-DDSM/Combined_full_ROI/1152x896_s10_prt_addtopf2_1.h5"
-BEST_MODEL="INbreast/train_dat_mod/resnet_s10_512-512-1024x2_mock.h5"
-FINAL_MODEL="NOSAVE"
 
+RESUME_FROM="ddsm_vgg16_s10_[512-512-1024]x2_hybrid.h5"
+BEST_MODEL="INbreast/transferred_inbreast_best_model.h5"
+FINAL_MODEL="NOSAVE"
 export NUM_CPU_CORES=4
 
 # 255/65535 = 0.003891.
-python image_clf_train.py \
+python ddsm_train/image_clf_train.py \
 	--no-patch-model-state \
 	--resume-from $RESUME_FROM \
     --img-size 1152 896 \
