@@ -119,12 +119,8 @@ class DMImagePreprocessor(object):
         _, img_bin = cv2.threshold(
             img_8u, low_th, maxval=255, type=cv2.THRESH_BINARY)
         ver = (cv2.__version__).split('.')
-        if int(ver[0]) < 3:
-            contours,_ = cv2.findContours(
-                img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        else:
-            _,contours,_ = cv2.findContours(
-                img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours,_ = cv2.findContours(
+            img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cont_areas = [ cv2.contourArea(cont) for cont in contours ]
         idx = np.argmax(cont_areas)  # find the largest contour, i.e. breast.
         breast_mask = cv2.drawContours(

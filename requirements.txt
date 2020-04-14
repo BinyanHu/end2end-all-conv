@@ -1,0 +1,6 @@
+Keras==2.0.8
+tensorflow-gpu==1.5.0
+opencv-python
+pandas
+pydicom
+Pillow
