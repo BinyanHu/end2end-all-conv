@@ -126,6 +126,13 @@ def sample_patches(img, roi_mask, out_dir, img_id, abn_id, pos, patch_size=256,
     sampled_abn = 0
     nb_try = 0
     while sampled_abn < nb_abn:
+        filename = basename + "_%04d" % (sampled_abn) + ".png"
+        fullname = os.path.join(roi_out, filename)
+        if os.path.exists(fullname):
+            print "already exists:", fullname
+            sampled_abn += 1
+            continue
+
         if nb_abn > 1:
             x = rng.randint(rx, rx + rw)
             y = rng.randint(ry, ry + rh)
@@ -141,6 +148,7 @@ def sample_patches(img, roi_mask, out_dir, img_id, abn_id, pos, patch_size=256,
         else:
             x = cx
             y = cy
+
         # import pdb; pdb.set_trace()
         if nb_abn == 1 or overlap_patch_roi((x, y), patch_size, roi_mask,
                                             cutoff=pos_cutoff):
@@ -150,18 +158,24 @@ def sample_patches(img, roi_mask, out_dir, img_id, abn_id, pos, patch_size=256,
             patch_img = toimage(patch, high=patch.max(), low=patch.min(),
                                 mode='I')
             # patch = patch.reshape((patch.shape[0], patch.shape[1], 1))
-            filename = basename + "_%04d" % (sampled_abn) + ".png"
-            fullname = os.path.join(roi_out, filename)
             # import pdb; pdb.set_trace()
             patch_img.save(fullname)
             sampled_abn += 1
             nb_try = 0
             if verbose:
-                print "sampled an abn_id patch at (x,y) center=", (x, y)
+                print "sampled an", abn_id, "patch at (x,y) center=", (x, y)
                 sys.stdout.flush()
+
     # Sample background.
     sampled_bkg = start_sample_nb
     while sampled_bkg < start_sample_nb + nb_bkg:
+        filename = basename + "_%04d" % (sampled_bkg) + ".png"
+        fullname = os.path.join(bkg_out, filename)
+        if os.path.exists(fullname):
+            print "already exists:", fullname
+            sampled_bkg += 1
+            continue
+
         x = rng.randint(patch_size/2, img.shape[1] - patch_size/2)
         y = rng.randint(patch_size/2, img.shape[0] - patch_size/2)
         if not overlap_patch_roi((x, y), patch_size, roi_mask, cutoff=neg_cutoff):
@@ -170,8 +184,6 @@ def sample_patches(img, roi_mask, out_dir, img_id, abn_id, pos, patch_size=256,
             patch = patch.astype('int32')
             patch_img = toimage(patch, high=patch.max(), low=patch.min(),
                                 mode='I')
-            filename = basename + "_%04d" % (sampled_bkg) + ".png"
-            fullname = os.path.join(bkg_out, filename)
             patch_img.save(fullname)
             sampled_bkg += 1
             if verbose:
