@@ -1,14 +1,16 @@
-import numpy as np
-import cv2
-import pandas as pd
+import argparse
 import os
 import sys
-import argparse
+
+import cv2
+import numpy as np
+import pandas as pd
 import pydicom as dicom
-from dm_image import read_resize_img, crop_img, add_img_margins
-from dm_preprocess import DMImagePreprocessor as imprep
-from PIL import Image
 from sklearn.model_selection import train_test_split
+
+from dm_image import add_img_margins, crop_img, read_resize_img
+from dm_preprocess import DMImagePreprocessor as imprep
+from pilutil import toimage
 
 #### Define some functions to use ####
 
@@ -145,8 +147,8 @@ def sample_patches(img, roi_mask, out_dir, img_id, abn_id, pos, patch_size=256,
             patch = img[y - patch_size/2:y + patch_size/2,
                         x - patch_size/2:x + patch_size/2]
             patch = patch.astype('int32')
-            patch_img = Image.fromarray(patch, high=patch.max(), low=patch.min(),
-                                        mode='I')
+            patch_img = toimage(patch, high=patch.max(), low=patch.min(),
+                                mode='I')
             # patch = patch.reshape((patch.shape[0], patch.shape[1], 1))
             filename = basename + "_%04d" % (sampled_abn) + ".png"
             fullname = os.path.join(roi_out, filename)
@@ -166,8 +168,8 @@ def sample_patches(img, roi_mask, out_dir, img_id, abn_id, pos, patch_size=256,
             patch = img[y - patch_size/2:y + patch_size/2,
                         x - patch_size/2:x + patch_size/2]
             patch = patch.astype('int32')
-            patch_img = Image.fromarray(patch, high=patch.max(), low=patch.min(),
-                                        mode='I')
+            patch_img = toimage(patch, high=patch.max(), low=patch.min(),
+                                mode='I')
             filename = basename + "_%04d" % (sampled_bkg) + ".png"
             fullname = os.path.join(bkg_out, filename)
             patch_img.save(fullname)
@@ -220,8 +222,8 @@ def sample_hard_negatives(img, roi_mask, out_dir, img_id, abn_id,
             patch = img[y - patch_size/2:y + patch_size/2,
                         x - patch_size/2:x + patch_size/2]
             patch = patch.astype('int32')
-            patch_img = Image.fromarray(patch, high=patch.max(), low=patch.min(),
-                                        mode='I')
+            patch_img = toimage(patch, high=patch.max(), low=patch.min(),
+                                mode='I')
             filename = basename + "_%04d" % (sampled_bkg) + ".png"
             fullname = os.path.join(bkg_out, filename)
             patch_img.save(fullname)
@@ -267,8 +269,8 @@ def sample_blob_negatives(img, roi_mask, out_dir, img_id, abn_id, blob_detector,
             patch = img[y - patch_size/2:y + patch_size/2,
                         x - patch_size/2:x + patch_size/2]
             patch = patch.astype('int32')
-            patch_img = Image.fromarray(patch, high=patch.max(), low=patch.min(),
-                                        mode='I')
+            patch_img = toimage(patch, high=patch.max(), low=patch.min(),
+                                mode='I')
             filename = basename + "_%04d" % (start_sample_nb + sampled_bkg) + ".png"
             fullname = os.path.join(bkg_out, filename)
             patch_img.save(fullname)

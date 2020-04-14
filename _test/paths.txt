@@ -1,0 +1,10 @@
+"CBIS-DDSM-png/Mass-Training Full Mammogram Images/Mass-Training_P_00001_LEFT_CC/07-20-2016-DDSM-74994/1-full mammogram images-24515/000000.png"
+
+"CBIS-DDSM-png/Mass-Training Full Mammogram Images/Mass-Training_P_00001_LEFT_MLO/07-20-2016-DDSM-90988/1-full mammogram images-80834/000000.png"
+
+"CBIS-DDSM-png/Mass-Training ROI and Cropped Images/Mass-Training_P_00001_LEFT_CC_1/07-21-2016-DDSM-39106/1-ROI mask images-99650/000000.png"
+"CBIS-DDSM-png/Mass-Training ROI and Cropped Images/Mass-Training_P_00001_LEFT_CC_1/07-21-2016-DDSM-39106/1-ROI mask images-99650/000001.png"
+
+CBIS-DDSM-png/Mass-Training ROI and Cropped Images/Mass-Training_P_00001_LEFT_CC_1/07-21-2016-DDSM-39106/1-ROI mask images-99650/000001.png
+
+CBIS-DDSM-png/Mass-Training ROI and Cropped Images/Mass-Training_P_00001_LEFT_CC_1/07-21-2016-DDSM-39106/1-ROI mask images-99650/
