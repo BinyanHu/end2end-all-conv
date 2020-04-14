@@ -299,7 +299,7 @@ def do_3stage_training(model, org_model, train_generator, validation_set,
         callbacks=callbacks, 
         nb_worker=nb_worker, 
         pickle_safe=pickle_safe,
-        verbose=2)
+        verbose=1)
     print "Done."
     try:
         loss_history = hist.history['val_loss']
@@ -332,7 +332,7 @@ def do_3stage_training(model, org_model, train_generator, validation_set,
             callbacks=callbacks, 
             nb_worker=nb_worker, 
             pickle_safe=pickle_safe,
-            verbose=2, initial_epoch=len(loss_history))
+            verbose=1, initial_epoch=len(loss_history))
         print "Done."
         try:
             loss_history = np.append(loss_history, hist.history['val_loss'])
@@ -356,7 +356,7 @@ def do_3stage_training(model, org_model, train_generator, validation_set,
             callbacks=callbacks, 
             nb_worker=nb_worker, 
             pickle_safe=pickle_safe,
-            verbose=2, initial_epoch=len(loss_history))
+            verbose=1, initial_epoch=len(loss_history))
         print "Done."
         try:
             loss_history = np.append(loss_history, hist.history['val_loss'])
@@ -434,7 +434,7 @@ def do_2stage_training(model, org_model, train_generator, validation_set,
         callbacks=callbacks, 
         nb_worker=nb_worker, 
         pickle_safe=pickle_safe,
-        verbose=2)
+        verbose=1)
     print "Done."
     try:
         loss_history = hist.history['val_loss']
@@ -467,7 +467,7 @@ def do_2stage_training(model, org_model, train_generator, validation_set,
         callbacks=callbacks, 
         nb_worker=nb_worker, 
         pickle_safe=pickle_safe,
-        verbose=2, initial_epoch=len(loss_history))
+        verbose=1, initial_epoch=len(loss_history))
     print "Done."
     try:
         loss_history = np.append(loss_history, hist.history['val_loss'])
