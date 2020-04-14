@@ -434,12 +434,12 @@ def run(description_path, roi_mask_dir, image_dir,
                                mass_pos_dir, mass_neg_dir, verbose)
                 bkg_sampled = True
 
-    #####
-    print "Sampling for train set"
-    sys.stdout.flush()
-    do_sampling(train_df, train_out_dir)
-    print "Done."
-    #####
+    # #####
+    # print "Sampling for train set"
+    # sys.stdout.flush()
+    # do_sampling(train_df, train_out_dir)
+    # print "Done."
+    # #####
     if val_size > 0.:
         print "Sampling for val set"
         sys.stdout.flush()

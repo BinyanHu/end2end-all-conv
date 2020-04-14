@@ -13,3 +13,4 @@ nohup.out
 /INbreast/
 /curated_breast_imaging_ddsm/
 *.h5
+*.pyc
