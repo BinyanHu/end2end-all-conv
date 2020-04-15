@@ -10,7 +10,8 @@ nohup.out
 .ipynb_checkpoints
 *.pyc
 
-/INbreast/
-/curated_breast_imaging_ddsm/
+data/curated_breast_imaging_ddsm/
 *.h5
-*.pyc
+
+_test/
+saved_model/

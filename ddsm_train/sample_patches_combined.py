@@ -15,15 +15,25 @@ from pilutil import toimage
 #### Define some functions to use ####
 
 
-def get_image_and_mask(patient_id, side, view, image_dir, roi_mask_dir, abn_type, abn_id, target_height, target_width):
+def get_image_and_mask(
+    patient_id,
+    side,
+    view,
+    image_dir,
+    roi_mask_dir,
+    abn_type,
+    abn_id,
+    target_height,
+    target_width
+):
     token_list = []
     token_list.append(("Calc" if abn_type == "calc" else "Mass") + "-Training")
     token_list.extend([patient_id, side, view])
-    
+
     # get image directory
     image_folder_name = "_".join(token_list)
     image_dir = os.path.join(image_dir, image_folder_name)
-    
+
     # search for the image
     image_path = None
     for cur_dir, sub_folders, file_names in os.walk(image_dir):
@@ -39,6 +49,8 @@ def get_image_and_mask(patient_id, side, view, image_dir, roi_mask_dir, abn_type
     if not image_path:
         raise RuntimeError("Could not find the image file.")
 
+    ori_image_shape = cv2.imread(image_path).shape[:2]
+
     if target_width is None:
         full_image = read_resize_img(image_path, target_height=target_height)
     else:
@@ -49,29 +61,22 @@ def get_image_and_mask(patient_id, side, view, image_dir, roi_mask_dir, abn_type
     # and mask, may be revsered!
     token_list.append(str(abn_id))
     roi_mask_folder_name = "_".join(token_list)
-    
-    roi_mask_paths = None
+
+    roi_mask_paths = []
     roi_mask_dir = os.path.join(roi_mask_dir, roi_mask_folder_name)
     for cur_dir, sub_folders, file_names in os.walk(roi_mask_dir):
-        if not file_names:
-            continue
-        elif len(file_names) == 2:
-            assert "000000.png" in file_names
-            assert "000001.png" in file_names
-            roi_mask_paths = [
-                os.path.join(cur_dir, "000000.png"),
-                os.path.join(cur_dir, "000001.png")
-            ]
-        else:
-            raise RuntimeError("ROI mask dir should contian 2 images.")
+        if file_names:
+            for file_name in file_names:
+                assert file_name in ("000000.png", "000001.png")
+                roi_mask_paths.append(os.path.join(cur_dir, file_name))
 
-    if not roi_mask_paths:
-        raise RuntimeError("Could not find the mask file.")
+    if len(roi_mask_paths) != 2:
+        raise RuntimeError("Wrong number of image files in %s." % roi_mask_dir)
 
     mask_path = None
     for path in roi_mask_paths:
         mask = cv2.imread(path)
-        if mask.shape[:2] == full_image.shape[:2]:
+        if mask.shape[:2] == ori_image_shape:
             mask_path = path
             break
     if mask_path is None:
@@ -81,7 +86,7 @@ def get_image_and_mask(patient_id, side, view, image_dir, roi_mask_dir, abn_type
         mask_image = read_resize_img(mask_path, target_height=target_height, gs_255=True)
     else:
         mask_image = read_resize_img(mask_path, target_size=(target_height, target_width), gs_255=True)
-    
+
     return full_image, mask_image
 
 
@@ -210,10 +215,10 @@ def sample_patches(image, roi_mask, out_dir, image_id, abn_id, pos, patch_size=2
         if nb_abn == 1 or overlap_patch_roi((x, y), patch_size, roi_mask,
                                             cutoff=pos_cutoff):
             patch = image[y - patch_size/2:y + patch_size/2,
-                        x - patch_size/2:x + patch_size/2]
+                          x - patch_size/2:x + patch_size/2]
             patch = patch.astype("int32")
             patch_image = toimage(patch, high=patch.max(), low=patch.min(),
-                                mode="I")
+                                  mode="I")
             # patch = patch.reshape((patch.shape[0], patch.shape[1], 1))
             # import pdb; pdb.set_trace()
             patch_image.save(fullname)
@@ -237,10 +242,10 @@ def sample_patches(image, roi_mask, out_dir, image_id, abn_id, pos, patch_size=2
         y = rng.randint(patch_size/2, image.shape[0] - patch_size/2)
         if not overlap_patch_roi((x, y), patch_size, roi_mask, cutoff=neg_cutoff):
             patch = image[y - patch_size/2:y + patch_size/2,
-                        x - patch_size/2:x + patch_size/2]
+                          x - patch_size/2:x + patch_size/2]
             patch = patch.astype("int32")
             patch_image = toimage(patch, high=patch.max(), low=patch.min(),
-                                mode="I")
+                                  mode="I")
             patch_image.save(fullname)
             sampled_bkg += 1
             if verbose:
@@ -257,6 +262,9 @@ def sample_hard_negatives(image, roi_mask, out_dir, image_id, abn_id,
     for classification.
     """
     bkg_out = os.path.join(out_dir, bkg_dir)
+    if not os.path.exists(bkg_out):
+        os.makedirs(bkg_out)
+
     basename = "_".join([image_id, str(abn_id)])
 
     image = add_img_margins(image, patch_size/2)
@@ -289,10 +297,10 @@ def sample_hard_negatives(image, roi_mask, out_dir, image_id, abn_id,
         y = rng.randint(y1, y2)
         if not overlap_patch_roi((x, y), patch_size, roi_mask, cutoff=neg_cutoff):
             patch = image[y - patch_size/2:y + patch_size/2,
-                        x - patch_size/2:x + patch_size/2]
+                          x - patch_size/2:x + patch_size/2]
             patch = patch.astype("int32")
             patch_image = toimage(patch, high=patch.max(), low=patch.min(),
-                                mode="I")
+                                  mode="I")
             filename = basename + "_%04d" % (sampled_bkg) + ".png"
             fullname = os.path.join(bkg_out, filename)
             patch_image.save(fullname)
@@ -307,6 +315,9 @@ def sample_blob_negatives(image, roi_mask, out_dir, image_id, abn_id, blob_detec
                           start_sample_nb=0,
                           bkg_dir="background", verbose=False):
     bkg_out = os.path.join(out_dir, bkg_dir)
+    if not os.path.exists(bkg_out):
+        os.makedirs(bkg_out)
+
     basename = "_".join([image_id, str(abn_id)])
 
     image = add_img_margins(image, patch_size/2)
@@ -336,10 +347,10 @@ def sample_blob_negatives(image, roi_mask, out_dir, image_id, abn_id, blob_detec
         x, y = int(kp.pt[0]), int(kp.pt[1])
         if not overlap_patch_roi((x, y), patch_size, roi_mask, cutoff=neg_cutoff):
             patch = image[y - patch_size/2:y + patch_size/2,
-                        x - patch_size/2:x + patch_size/2]
+                          x - patch_size/2:x + patch_size/2]
             patch = patch.astype("int32")
             patch_image = toimage(patch, high=patch.max(), low=patch.min(),
-                                mode="I")
+                                  mode="I")
             filename = basename + "_%04d" % (start_sample_nb + sampled_bkg) + ".png"
             fullname = os.path.join(bkg_out, filename)
             patch_image.save(fullname)
@@ -443,50 +454,55 @@ def run(description_path, roi_mask_dir, image_dir,
             # Read mask image(s).
             bkg_sampled = False
             for abn_id, pathology, abn_type in zip(abn_ids, pathologies, abn_types):
-                # NOTE csv not reliable due to formatting error.
+                # NOTE csv not reliable due to formatting error, and there are missing files.
                 # image_path = cur_desc["image file path"]
                 # mask_path = cur_desc["ROI mask file path"]
-                full_image, mask_image = get_image_and_mask(
-                    patient_id=patient_id,
-                    side=side,
-                    view=view,
-                    roi_mask_dir=roi_mask_dir,
-                    abn_type=abn_type,
-                    abn_id=abn_id,
-                    target_width=target_width
-                )
+                try:
+                    full_image, mask_image = get_image_and_mask(
+                        patient_id=patient_id,
+                        side=side,
+                        view=view,
+                        image_dir=image_dir,
+                        roi_mask_dir=roi_mask_dir,
+                        abn_type=abn_type,
+                        abn_id=abn_id,
+                        target_height=target_height,
+                        target_width=target_width
+                    )
 
-                image_id = "_".join([patient_id, side, view])
-                print "ID:%s, read image of size=%s" % (image_id, full_image.shape)
-                if segment_breast:
-                    full_image, bbox = imprep.segment_breast(full_image)
-                    print "size after segmentation=%s" % (str(full_image.shape))
-                    mask_image = crop_img(mask_image, bbox)
+                    image_id = "_".join([patient_id, side, view])
+                    print "ID:%s, read image of size=%s" % (image_id, full_image.shape)
+                    if segment_breast:
+                        full_image, bbox = imprep.segment_breast(full_image)
+                        print "size after segmentation=%s" % (str(full_image.shape))
+                        mask_image = crop_img(mask_image, bbox)
 
-                # sample using mask and full image.
-                nb_hns_ = nb_hns if not bkg_sampled else 0
-                if nb_hns_ > 0:
-                    hns_sampled = sample_blob_negatives(
-                        full_image, mask_image, out_dir, image_id,
-                        abn_id, blob_detector, patch_size, neg_cutoff,
-                        nb_hns_, 0, bkg_dir, verbose)
-                else:
-                    hns_sampled = 0
-                pos = pathology.startswith("MALIGNANT")
-                nb_bkg_ = nb_bkg - hns_sampled if not bkg_sampled else 0
-                sample_patches(full_image, mask_image, out_dir, image_id, abn_id, pos,
-                               patch_size, pos_cutoff, neg_cutoff,
-                               nb_bkg_, nb_abn, hns_sampled, abn_type,
-                               bkg_dir, calc_pos_dir, calc_neg_dir,
-                               mass_pos_dir, mass_neg_dir, verbose)
-                bkg_sampled = True
+                    # sample using mask and full image.
+                    nb_hns_ = nb_hns if not bkg_sampled else 0
+                    if nb_hns_ > 0:
+                        hns_sampled = sample_blob_negatives(
+                            full_image, mask_image, out_dir, image_id,
+                            abn_id, blob_detector, patch_size, neg_cutoff,
+                            nb_hns_, 0, bkg_dir, verbose)
+                    else:
+                        hns_sampled = 0
+                    pos = pathology.startswith("MALIGNANT")
+                    nb_bkg_ = nb_bkg - hns_sampled if not bkg_sampled else 0
+                    sample_patches(full_image, mask_image, out_dir, image_id, abn_id, pos,
+                                   patch_size, pos_cutoff, neg_cutoff,
+                                   nb_bkg_, nb_abn, hns_sampled, abn_type,
+                                   bkg_dir, calc_pos_dir, calc_neg_dir,
+                                   mass_pos_dir, mass_neg_dir, verbose)
+                    bkg_sampled = True
+                except RuntimeError as exception:
+                    print exception
 
-    #####
-    print "Sampling for train set"
-    sys.stdout.flush()
-    do_sampling(train_df, train_out_dir)
-    print "Done."
-    #####
+    # #####
+    # print "Sampling for train set"
+    # sys.stdout.flush()
+    # do_sampling(train_df, train_out_dir)
+    # print "Done."
+    # #####
     if valid_size > 0:
         print "Sampling for val set"
         sys.stdout.flush()
