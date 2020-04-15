@@ -14,7 +14,111 @@ This is the companion site for our paper that was originally titled "End-to-end 
 
 For our entry in the DREAM2016 Digital Mammography challenge, see this [write-up](https://www.synapse.org/LiShenDMChallenge). This work is much improved from our method used in the challenge.
 
+
+
+## Issues Resolved
+
+### Requirements
+
+The project uses Python2 with several packages of old versions. The following configuration is inferred from the code and proved to work:
+
+```
+Keras==2.0.8
+tensorflow-gpu==1.5.0
+opencv-python
+pandas
+pydicom
+Pillow
+```
+
+Install all the packages with:
+
+```shell
+pip install -r requirements.txt
+```
+
+
+
+### API changes
+
+Versions of some packages, such as OpenCV and scipy are hard to infer, so we install the latest and update the code. Known changes are:
+
+1. `cv2.findContours` returns 2 parameters instead of 3. So each of the following code block:
+
+   ```python
+   if int(ver[0]) < 3:
+   	contours,_ = cv2.findContours(img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+   else:
+   	_,contours,_ = cv2.findContours(img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+   ```
+
+   should be changed to:
+
+   ```python
+   contours,_ = cv2.findContours(img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+   ```
+
+   
+
+2. `scipy.misc.toimage` is deprecated and has been removed for a long time. We took the file `piltil.py` and placed it in the project directory, so that we can replace:
+
+   ```python
+   from scipy.misc import toimage
+   ```
+
+   and import it by:
+
+   ```python
+   from pilutil import toimage
+   ```
+
+
+
+### Data Preprocessing
+
+Use [convert_dicom_to_png.py](convert_dicom_to_png.py) to converting the scans from `.dcm` to `.png` format. The raw dataset is expected to be downloaded to `CBIS-DDSM`, and this script will store all the png images into a  new directory named `CBIS-DDSM-png`. See the python file for more details.
+
+
+
+### Data Generation
+
+The folder names and the description files we are using are different from those of the author of this project. The [patch dataset generation script](ddsm_train\sample_patches_combined.py) must be modified to adapt these changes. 
+
+1. The index names of the description files (those ends with `.csv`) have changed. As is discussed in [issue/2](https://github.com/lishen/end2end-all-conv/issues/2#issuecomment-338938924), we should change the key string names of the python files or the column names of the csv files for reproduction. A comparison is listed below:
+
+   | name in python code | name in description csv |
+   | ------------------- | ----------------------- |
+   | "side"              | "left or right breast"  |
+   | "view"              | "image view"            |
+
+
+
+2. The file paths of the images have changed, so the function `const_filename` can not be used. The file paths are also supposed to be accessible  in the description csv files. However, the information in our description files does not match datasets. For example, according to the description, an image which is supposed to be located at
+
+   ```
+   Mass-Training_P_00001_LEFT_CC/1.3.6.1.4.1.9590.100.1.2.422112722213189649807611434612228974994/1.3.6.1.4.1.9590.100.1.2.342386194811267636608694132590482924515/000000.dcm
+   ```
+
+   is actually located at:
+
+   ```
+   Mass-Training Full Mammogram Images/Mass-Training_P_00001_LEFT_CC/07-20-2016-DDSM-74994/1-full mammogram images-24515/000000.png
+   ```
+
+   Issues caused by the file path inconsistence are also found in [tensorflow_datasets curated_breast_imaging_ddsm](https://www.tensorflow.org/datasets/catalog/curated_breast_imaging_ddsm). 
+
+   Therefore, we rewrote the function `const_filename`  to automatically search the file path. However, this still does not guarantee that we load the correct files; see "Issues NOT Resolved" for detail.
+
+
+
+## Issues NOT Resolved
+
+1. The ROI images and the masks are stored together in the same folders (the two ending with "ROI and Cropped Images"). However, the definitions of file prefixes, namely, "000000" and "000001" are inconsistent. In some cases, "0" is the cropped image and "1" is the mask, whereas in other cases, the definitions are reversed. As the exact file path can neither be read from the description csv files nor be, we need an algorithm to automatically tell the ROI images and the masks.
+
+
+
 ## Whole image model downloads
+
 A few best whole image models are available for downloading at this Google Drive [folder](https://drive.google.com/open?id=0B1PVLadG_dCKV2pZem5MTjc1cHc). YaroslavNet is the DM challenge top-performing team's [method](https://www.synapse.org/#!Synapse:syn9773040/wiki/426908). Here is a table for individual downloads:
 
 | Database  | Patch Classifier  | Top Layers (two blocks)  | Single AUC  | Augmented AUC  | Link  |

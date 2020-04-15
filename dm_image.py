@@ -1168,11 +1168,11 @@ class DMDirectoryIterator(Iterator):
             return sorted(os.walk(subpath, followlinks=follow_links), key=lambda tpl: tpl[0])
 
         for subdir in classes:
-            print "scaning", subdir
+            # print "scaning", subdir
             subpath = path.join(directory, subdir)
             for root, dirs, files in _recursive_list(subpath):
                 for fname in files:
-                    print "visiting", root, fname
+                    # print "visiting", root, fname
                     is_valid = False
                     for extension in white_list_formats:
                         if fname.lower().endswith('.' + extension):
