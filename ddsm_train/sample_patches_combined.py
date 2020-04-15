@@ -37,15 +37,13 @@ def get_image_and_mask(
     # search for the image
     image_path = None
     for cur_dir, sub_folders, file_names in os.walk(image_dir):
-        if not file_names:
-            continue
-        elif len(file_names) == 1:
-            file_name = file_names[0]
-            assert file_name == "000000.png"
-            image_path = os.path.join(cur_dir, "000000.png")
-            break
-        else:
-            raise RuntimeError("Found more than one files.")
+        if file_names:
+            for file_name in file_names:
+                if file_name.endswith(".png"):
+                    assert file_name == "000000.png"
+                    image_path = os.path.join(cur_dir, "000000.png")
+                    break
+
     if not image_path:
         raise RuntimeError("Could not find the image file.")
 
@@ -67,8 +65,9 @@ def get_image_and_mask(
     for cur_dir, sub_folders, file_names in os.walk(roi_mask_dir):
         if file_names:
             for file_name in file_names:
-                assert file_name in ("000000.png", "000001.png")
-                roi_mask_paths.append(os.path.join(cur_dir, file_name))
+                if file_name.endswith(".png"):
+                    assert file_name in ("000000.png", "000001.png")
+                    roi_mask_paths.append(os.path.join(cur_dir, file_name))
 
     if len(roi_mask_paths) != 2:
         raise RuntimeError("Wrong number of image files in %s." % roi_mask_dir)

@@ -31,12 +31,6 @@ pydicom
 Pillow
 ```
 
-Install all the packages with:
-
-```shell
-pip install -r requirements.txt
-```
-
 
 
 ### API changes
@@ -76,7 +70,7 @@ Versions of some packages, such as OpenCV and scipy are hard to infer, so we ins
 
 ### Data Preprocessing
 
-Use [convert_dicom_to_png.py](convert_dicom_to_png.py) to converting the scans from `.dcm` to `.png` format. The raw dataset is expected to be downloaded to `CBIS-DDSM`, and this script will store all the png images into a  new directory named `CBIS-DDSM-png`. See the python file for more details.
+Use [convert_dicom_to_png.py](ddsm_train\convert_dicom_to_png.py) to converting the scans from `.dcm` to `.png` format. The raw dataset is expected to be downloaded to `CBIS-DDSM`, and this script will store all the png images into a  new directory named `CBIS-DDSM-png`. See the python file for more details.
 
 
 
@@ -93,7 +87,7 @@ The folder names and the description files we are using are different from those
 
 
 
-2. The file paths of the images have changed, so the function `const_filename` can not be used. The file paths are also supposed to be accessible  in the description csv files. However, the information in our description files does not match datasets. For example, according to the description, an image which is supposed to be located at
+2. The file paths of the images have changed, so the function `const_filename` can not be used. The file paths are also supposed to be accessible  in the description csv files. However, the information in our description files does not match the current dataset. For example, according to the description, an image which is supposed to be located at
 
    ```
    Mass-Training_P_00001_LEFT_CC/1.3.6.1.4.1.9590.100.1.2.422112722213189649807611434612228974994/1.3.6.1.4.1.9590.100.1.2.342386194811267636608694132590482924515/000000.dcm
@@ -107,13 +101,84 @@ The folder names and the description files we are using are different from those
 
    Issues caused by the file path inconsistence are also found in [tensorflow_datasets curated_breast_imaging_ddsm](https://www.tensorflow.org/datasets/catalog/curated_breast_imaging_ddsm). 
 
-   Therefore, we rewrote the function `const_filename`  to automatically search the file path. However, this still does not guarantee that we load the correct files; see "Issues NOT Resolved" for detail.
+   Therefore, we abandoned the function `const_filename` and wrote another function `get_image_and_mask` to automatically search the file path, match and load the image files.
 
 
 
 ## Issues NOT Resolved
 
-1. The ROI images and the masks are stored together in the same folders (the two ending with "ROI and Cropped Images"). However, the definitions of file prefixes, namely, "000000" and "000001" are inconsistent. In some cases, "0" is the cropped image and "1" is the mask, whereas in other cases, the definitions are reversed. As the exact file path can neither be read from the description csv files nor be, we need an algorithm to automatically tell the ROI images and the masks.
+1. The original code does not generate test set, but test set is used in the demos. If you hope to use test sets, modify [sample_patches_combined.py](ddsm_train\sample_patches_combined.py) to implement test set splitting.
+
+
+
+## Usage
+
+Things got easier after we have resolved some issues and rewrote some scripts. The following is a step-by-step example of training a model to classify image patches into 3 classes.
+
+
+
+### Environment Creation
+
+Install all the packages with:
+
+```shell
+pip install -r requirements.txt
+```
+
+
+
+### Data Generation
+
+1. Download the DDSM dataset and use [convert_dicom_to_png.py](ddsm_train\convert_dicom_to_png.py) mentioned above to convert all scans to png format. Finally, put the png dataset directory into `data/`. Please check the directory tree structure to ensure that the following steps will work:
+
+   ```
+   end2end-all-conv/data/
+   	curated_breast_imaging_ddsm/
+   		Calc-Test Full Mammogram Images/
+   		Calc-Test ROI and Cropped Images/
+   		Calc-Training Full Mammogram Images/
+   		Calc-Training ROI and Cropped Images/
+   		Mass-Test Full Mammogram Images/
+   		Mass-Test ROI and Cropped Images/
+   		Mass-Training Full Mammogram Images/
+   		Mass-Training ROI and Cropped Images/
+   		calc_case_description_test_set.csv
+   		calc_case_description_train_set.csv
+   		mass_case_description_test_set.csv
+   		mass_case_description_train_set.csv
+   ```
+
+
+
+2. Run [gen_ddsm_dataset.sh](ddsm_train\gen_ddsm_dataset.sh) to generate the dataset. This script will crop image patches of shape `(256, 256)` from the dataset. Modify the shell script to tune parameters like output directories and numbers of each class. In the example we set all numbers of the samples to 1 for a quick test, but it is recommended to set them larger to ensure model convergence.
+
+   After the generation is finished, a new director `train_dat_mod` should appear in the `data/` directory:
+
+   ```
+   end2end-all-conv/data/
+   	curated_breast_imaging_ddsm/
+   		train_dat_mod/
+   			train/
+   				background/
+   				mass_ben/
+   				mass_mal/
+   				pat_lst.txt
+   			val/
+   				background/
+   				mass_ben/
+   				mass_mal
+   				pat_lst.txt
+   ```
+
+   Also, check the size and contents of the images. If there exists all-black images, go back and check the image generation step.
+
+   ![Figure: Image patch sample](img\patch_sample.png)
+
+   
+
+### Model Training
+
+Run [train_image_clf_ddsm.sh](ddsm_train\train_image_clf_ddsm.sh)  to train a classification model Model with the dataset we just made. This model accepts input images of shape `(256,256)` and output classifications of the three classes: background, benign mass and malignant mass. This model can be used for inferencing or transfer-learning.
 
 
 
