@@ -127,6 +127,16 @@ pip install -r requirements.txt
 
 
 
+Note that we are using Keras 2.0.8 which depends on TensorFlow 1.5.0. So load CUDA 9 and CuDNN 7 by:
+
+```shell
+module load cudnn/7.0.5-cuda-9.0.176
+```
+
+before running any programs.
+
+
+
 ### Data Generation
 
 1. Download the DDSM dataset and use [convert_dicom_to_png.py](ddsm_train\convert_dicom_to_png.py) mentioned above to convert all scans to png format. Finally, put the png dataset directory into `data/`. Please check the directory tree structure to ensure that the following steps will work:
