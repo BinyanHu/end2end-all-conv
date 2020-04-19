@@ -29,6 +29,7 @@ opencv-python
 pandas
 pydicom
 Pillow
+h5py
 ```
 
 
@@ -137,6 +138,14 @@ before running any programs.
 
 
 
+Also, add the current project directory to `PYTHONPATH` so that the Python modules can be correctly imported.
+
+```shell
+export PYTHONPATH=$PYTHONPATH:your_path_to_repos/end2end-all-conv
+```
+
+
+
 ### Data Generation
 
 1. Download the DDSM dataset and use [convert_dicom_to_png.py](ddsm_train\convert_dicom_to_png.py) mentioned above to convert all scans to png format. Finally, put the png dataset directory into `data/`. Please check the directory tree structure to ensure that the following steps will work:
@@ -160,7 +169,7 @@ before running any programs.
 
 
 
-2. Run [gen_ddsm_dataset.sh](ddsm_train\gen_ddsm_dataset.sh) to generate the dataset. This script will crop image patches of shape `(256, 256)` from the dataset. Modify the shell script to tune parameters like output directories and numbers of each class. In the example we set all numbers of the samples to 1 for a quick test, but it is recommended to set them larger to ensure model convergence.
+2. Run [gen_ddsm_dataset.sh](ddsm_train\gen_ddsm_dataset.sh) to generate the dataset. This script will crop image patches of shape `(256, 256)` from the dataset. Modify the shell script to tune parameters like output directories and numbers of each class. In the example we set all numbers of the samples to 1 for a quick test, but it is recommended to set them larger to ensure a stable training.
 
    After the generation is finished, a new director `train_dat_mod` should appear in the `data/` directory:
 

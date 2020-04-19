@@ -4,3 +4,4 @@ opencv-python
 pandas
 pydicom
 Pillow
+h5py
