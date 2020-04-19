@@ -14,7 +14,7 @@
 module load openmpi/4.0.0
 module load cudnn/7.0.5-cuda-9.0.176
 
-conda activate py2
+source activate py2
 
 cd "/fred/oz121/repos/end2end-all-conv/"
 

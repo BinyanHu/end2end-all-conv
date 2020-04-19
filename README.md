@@ -9,195 +9,21 @@ New York, New York, USA
 
 ![Fig1](https://raw.githubusercontent.com/lishen/end2end-all-conv/master/ddsm_train/Fig-1%20patch%20to%20whole%20image%20conv.jpg "Convert conv net from patch to whole image")
 
+
+
+As the project was created  years ago without a description of library requirements, many methods can not work with the latest libraries. Therefore, we have made some necessary modifications to make it compatible. See [Summary of ISSUES](ISSUES.md) for the details about how we modified the code. For a quick start, see [Usage](USAGE.md).
+
+
+
+Below is the original readme.
+
+
+
 ## Introduction
+
 This is the companion site for our paper that was originally titled "End-to-end Training for Whole Image Breast Cancer Diagnosis using An All Convolutional Design" and was retitled as "Deep Learning to Improve Breast Cancer Detection on Screening Mammography". The paper has been published [here](https://rdcu.be/bPOYf). You may also find the arXiv version [here](https://arxiv.org/abs/1708.09427). This work was initially presented at the NIPS17 workshop on machine learning for health. Access the 4-page short paper [here](https://arxiv.org/abs/1711.05775). Download the [poster](https://raw.githubusercontent.com/lishen/end2end-all-conv/master/ddsm_train/NIPS17%20ML4H%20Poster.pdf).
 
 For our entry in the DREAM2016 Digital Mammography challenge, see this [write-up](https://www.synapse.org/LiShenDMChallenge). This work is much improved from our method used in the challenge.
-
-
-
-## Issues Resolved
-
-### Requirements
-
-The project uses Python2 with several packages of old versions. The following configuration is inferred from the code and proved to work:
-
-```
-Keras==2.0.8
-tensorflow-gpu==1.5.0
-opencv-python
-pandas
-pydicom
-Pillow
-h5py
-```
-
-
-
-### API changes
-
-Versions of some packages, such as OpenCV and scipy are hard to infer, so we install the latest and update the code. Known changes are:
-
-1. `cv2.findContours` returns 2 parameters instead of 3. So each of the following code block:
-
-   ```python
-   if int(ver[0]) < 3:
-   	contours,_ = cv2.findContours(img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-   else:
-   	_,contours,_ = cv2.findContours(img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-   ```
-
-   should be changed to:
-
-   ```python
-   contours,_ = cv2.findContours(img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-   ```
-
-   
-
-2. `scipy.misc.toimage` is deprecated and has been removed for a long time. We took the file `piltil.py` and placed it in the project directory, so that we can replace:
-
-   ```python
-   from scipy.misc import toimage
-   ```
-
-   and import it by:
-
-   ```python
-   from pilutil import toimage
-   ```
-
-
-
-### Data Preprocessing
-
-Use [convert_dicom_to_png.py](ddsm_train\convert_dicom_to_png.py) to converting the scans from `.dcm` to `.png` format. The raw dataset is expected to be downloaded to `CBIS-DDSM`, and this script will store all the png images into a  new directory named `CBIS-DDSM-png`. See the python file for more details.
-
-
-
-### Data Generation
-
-The folder names and the description files we are using are different from those of the author of this project. The [patch dataset generation script](ddsm_train\sample_patches_combined.py) must be modified to adapt these changes. 
-
-1. The index names of the description files (those ends with `.csv`) have changed. As is discussed in [issue/2](https://github.com/lishen/end2end-all-conv/issues/2#issuecomment-338938924), we should change the key string names of the python files or the column names of the csv files for reproduction. A comparison is listed below:
-
-   | name in python code | name in description csv |
-   | ------------------- | ----------------------- |
-   | "side"              | "left or right breast"  |
-   | "view"              | "image view"            |
-
-
-
-2. The file paths of the images have changed, so the function `const_filename` can not be used. The file paths are also supposed to be accessible  in the description csv files. However, the information in our description files does not match the current dataset. For example, according to the description, an image which is supposed to be located at
-
-   ```
-   Mass-Training_P_00001_LEFT_CC/1.3.6.1.4.1.9590.100.1.2.422112722213189649807611434612228974994/1.3.6.1.4.1.9590.100.1.2.342386194811267636608694132590482924515/000000.dcm
-   ```
-
-   is actually located at:
-
-   ```
-   Mass-Training Full Mammogram Images/Mass-Training_P_00001_LEFT_CC/07-20-2016-DDSM-74994/1-full mammogram images-24515/000000.png
-   ```
-
-   Issues caused by the file path inconsistence are also found in [tensorflow_datasets curated_breast_imaging_ddsm](https://www.tensorflow.org/datasets/catalog/curated_breast_imaging_ddsm). 
-
-   Therefore, we abandoned the function `const_filename` and wrote another function `get_image_and_mask` to automatically search the file path, match and load the image files.
-
-
-
-## Issues NOT Resolved
-
-1. The original code does not generate test set, but test set is used in the demos. If you hope to use test sets, modify [sample_patches_combined.py](ddsm_train\sample_patches_combined.py) to implement test set splitting.
-
-
-
-## Usage
-
-Things got easier after we have resolved some issues and rewrote some scripts. The following is a step-by-step example of training a model to classify image patches into 3 classes.
-
-
-
-### Environment Creation
-
-Install all the packages with:
-
-```shell
-pip install -r requirements.txt
-```
-
-
-
-Note that we are using Keras 2.0.8 which depends on TensorFlow 1.5.0. So load CUDA 9 and CuDNN 7 by:
-
-```shell
-module load cudnn/7.0.5-cuda-9.0.176
-```
-
-before running any programs.
-
-
-
-Also, add the current project directory to `PYTHONPATH` so that the Python modules can be correctly imported.
-
-```shell
-export PYTHONPATH=$PYTHONPATH:your_path_to_repos/end2end-all-conv
-```
-
-
-
-### Data Generation
-
-1. Download the DDSM dataset and use [convert_dicom_to_png.py](ddsm_train\convert_dicom_to_png.py) mentioned above to convert all scans to png format. Finally, put the png dataset directory into `data/`. Please check the directory tree structure to ensure that the following steps will work:
-
-   ```
-   end2end-all-conv/data/
-   	curated_breast_imaging_ddsm/
-   		Calc-Test Full Mammogram Images/
-   		Calc-Test ROI and Cropped Images/
-   		Calc-Training Full Mammogram Images/
-   		Calc-Training ROI and Cropped Images/
-   		Mass-Test Full Mammogram Images/
-   		Mass-Test ROI and Cropped Images/
-   		Mass-Training Full Mammogram Images/
-   		Mass-Training ROI and Cropped Images/
-   		calc_case_description_test_set.csv
-   		calc_case_description_train_set.csv
-   		mass_case_description_test_set.csv
-   		mass_case_description_train_set.csv
-   ```
-
-
-
-2. Run [gen_ddsm_dataset.sh](ddsm_train\gen_ddsm_dataset.sh) to generate the dataset. This script will crop image patches of shape `(256, 256)` from the dataset. Modify the shell script to tune parameters like output directories and numbers of each class. In the example we set all numbers of the samples to 1 for a quick test, but it is recommended to set them larger to ensure a stable training.
-
-   After the generation is finished, a new director `train_dat_mod` should appear in the `data/` directory:
-
-   ```
-   end2end-all-conv/data/
-   	curated_breast_imaging_ddsm/
-   		train_dat_mod/
-   			train/
-   				background/
-   				mass_ben/
-   				mass_mal/
-   				pat_lst.txt
-   			val/
-   				background/
-   				mass_ben/
-   				mass_mal
-   				pat_lst.txt
-   ```
-
-   Also, check the size and contents of the images. If there exists all-black images, go back and check the image generation step.
-
-   ![Figure: Image patch sample](img\patch_sample.png)
-
-   
-
-### Model Training
-
-Run [train_image_clf_ddsm.sh](ddsm_train\train_image_clf_ddsm.sh)  to train a classification model Model with the dataset we just made. This model accepts input images of shape `(256,256)` and output classifications of the three classes: background, benign mass and malignant mass. This model can be used for inferencing or transfer-learning.
 
 
 
@@ -293,7 +119,7 @@ python image_clf_train.py \
     $TRAIN_DIR $VAL_DIR $TEST_DIR
 ```
 Some explanations of the arguments:
-- The batch size for training is the product of `--batch-size` and `--train-bs-multiplier`. Because training uses roughtly twice (both forward and back props) the GPU memory of testing, `--train-bs-multiplier` is set to 0.5 here.
+- The batch size for training is the product of `--batch-size` and `--train-bs-multiplier`. Because training uses roughly twice (both forward and back props) the GPU memory of testing, `--train-bs-multiplier` is set to 0.5 here.
 - For model finetuning, only the second stage of the two-stage training is used here. So `--nb-epoch` is set to 0.
 - `--load-val-ram` and `--load-train-ram` will load the image data from the validation and train sets into memory. You may want to turn off these options if you don't have sufficient memory. When turned off, out-of-core training will be used.
 - `--weight-decay` and `--hidden-dropout` are for stage 1. `--weight-decay2` and `--hidden-dropout2` are for stage 2.
