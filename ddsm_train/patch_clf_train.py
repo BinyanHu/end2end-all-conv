@@ -185,19 +185,22 @@ def run(train_dir, val_dir, test_dir,
         equalize_hist=equalize_hist, dup_3_channels=dup_3_channels,
         classes=class_list, class_mode='categorical', batch_size=batch_size,
         preprocess=preprocess_input, shuffle=False)
-    print "Test samples =", test_generator.nb_sample
-    print "Load saved best model:", best_model + '.',
-    sys.stdout.flush()
-    org_model.load_weights(best_model)
-    print "Done."
-    test_steps = int(test_generator.nb_sample/batch_size)
-    #### DEBUG ####
-    # test_samples = 10
-    #### DEBUG ####
-    test_res = model.evaluate_generator(
-        test_generator, test_steps, nb_worker=nb_worker,
-        pickle_safe=True if nb_worker > 1 else False)
-    print "Evaluation result on test set:", test_res
+    if test_generator.nb_sample:
+        print "Test samples =", test_generator.nb_sample
+        print "Load saved best model:", best_model + '.',
+        sys.stdout.flush()
+        org_model.load_weights(best_model)
+        print "Done."
+        test_steps = int(test_generator.nb_sample/batch_size)
+        #### DEBUG ####
+        # test_samples = 10
+        #### DEBUG ####
+        test_res = model.evaluate_generator(
+            test_generator, test_steps, nb_worker=nb_worker,
+            pickle_safe=True if nb_worker > 1 else False)
+        print "Evaluation result on test set:", test_res
+    else:
+        print "Skip testing because no test sample is found."
 
 
 if __name__ == '__main__':
