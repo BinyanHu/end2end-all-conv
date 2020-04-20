@@ -5,17 +5,15 @@ import sys
 import cv2
 import numpy as np
 import pandas as pd
-import pydicom as dicom
 from sklearn.model_selection import train_test_split
 
 from dm_image import add_img_margins, crop_img, read_resize_img
 from dm_preprocess import DMImagePreprocessor as imprep
 from pilutil import toimage
 
-#### Define some functions to use ####
-
 
 def get_image_and_mask(
+    split,
     patient_id,
     side,
     view,
@@ -27,12 +25,15 @@ def get_image_and_mask(
     target_width
 ):
     token_list = []
-    token_list.append(("Calc" if abn_type == "calc" else "Mass") + "-Training")
+    token_list.append(("Calc" if abn_type == "calc" else "Mass") + "-" + split)
     token_list.extend([patient_id, side, view])
 
     # get image directory
     image_folder_name = "_".join(token_list)
-    image_dir = os.path.join(image_dir, image_folder_name)
+    if split == "Training":
+        image_dir = os.path.join(image_dir, image_folder_name)
+    else:
+        image_dir = os.path.join(image_dir, "CBIS-DDSM", image_folder_name)
 
     # search for the image
     image_path = None
@@ -61,7 +62,10 @@ def get_image_and_mask(
     roi_mask_folder_name = "_".join(token_list)
 
     roi_mask_paths = []
-    roi_mask_dir = os.path.join(roi_mask_dir, roi_mask_folder_name)
+    if split == "Training":
+        roi_mask_dir = os.path.join(roi_mask_dir, roi_mask_folder_name)
+    else:
+        roi_mask_dir = os.path.join(roi_mask_dir, "CBIS-DDSM", roi_mask_folder_name)
     for cur_dir, sub_folders, file_names in os.walk(roi_mask_dir):
         if file_names:
             for file_name in file_names:
@@ -382,8 +386,6 @@ def run(description_path, roi_mask_dir, image_dir,
 
     if not os.path.exists(train_out_dir):
         os.makedirs(train_out_dir)
-    if not os.path.exists(valid_out_dir):
-        os.makedirs(valid_out_dir)
 
     # Read ROI mask table with pathology.
     description_df = pd.read_csv(description_path, header=0)
@@ -419,7 +421,9 @@ def run(description_path, roi_mask_dir, image_dir,
             f.close()
 
     if valid_size > 0:
-        # import pdb; pdb.set_trace()
+        if not os.path.exists(valid_out_dir):
+            os.makedirs(valid_out_dir)
+
         patient_ids, pat_val, labs_train, labs_val = train_test_split(
             patient_ids, pat_labs, stratify=pat_labs, test_size=valid_size,
             random_state=12345)
@@ -458,6 +462,7 @@ def run(description_path, roi_mask_dir, image_dir,
                 # mask_path = cur_desc["ROI mask file path"]
                 try:
                     full_image, mask_image = get_image_and_mask(
+                        split="Training" if "train" in description_path else "Test",
                         patient_id=patient_id,
                         side=side,
                         view=view,
@@ -496,12 +501,12 @@ def run(description_path, roi_mask_dir, image_dir,
                 except RuntimeError as exception:
                     print exception
 
-    # #####
-    # print "Sampling for train set"
-    # sys.stdout.flush()
-    # do_sampling(train_df, train_out_dir)
-    # print "Done."
-    # #####
+    #####
+    print "Sampling for train set"
+    sys.stdout.flush()
+    do_sampling(train_df, train_out_dir)
+    print "Done."
+    #####
     if valid_size > 0:
         print "Sampling for val set"
         sys.stdout.flush()

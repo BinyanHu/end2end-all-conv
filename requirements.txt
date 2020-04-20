@@ -5,3 +5,4 @@ pandas
 pydicom
 Pillow
 h5py
+sklearn
