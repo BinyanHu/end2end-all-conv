@@ -10,7 +10,7 @@ FINAL_MODEL="NOSAVE"
 export NUM_CPU_CORES=4
 
 # 255/65535 = 0.003891.
-python image_clf_train.py \
+python ddsm_train/image_clf_train.py \
 	--patch-model-state $PATCH_STATE \
 	--no-resume-from \
     --img-size 1152 896 \
@@ -21,7 +21,6 @@ python image_clf_train.py \
     --no-equalize-hist \
     --top-depths 512 512 \
     --top-repetitions 3 3 \
-	--kept-layer-idx -5 \
     --batch-size 20 \
     --train-bs-multiplier 0.5 \
 	--augmentation \
@@ -34,7 +33,6 @@ python image_clf_train.py \
     --optimizer adam \
     --weight-decay 0.0001 \
     --weight-decay2 0.0001 \
-    --bias-multiplier 0.1 \
     --hidden-dropout 0.0 \
     --hidden-dropout2 0.0 \
     --init-learningrate 0.001 \
