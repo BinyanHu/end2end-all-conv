@@ -16,9 +16,9 @@ module load cudnn/7.0.5-cuda-9.0.176
 
 source activate py2
 
-cd "/fred/oz121/repos/end2end-all-conv/"
+cd "/fred/oz121/binyan/repos/end2end-all-conv/"
 
-export PYTHONPATH=$PYTHONPATH:"/fred/oz121/repos/end2end-all-conv/"
+export PYTHONPATH=$PYTHONPATH:"/fred/oz121/binyan/repos/end2end-all-conv/"
 
 export NUM_CPU_CORES=4
 
