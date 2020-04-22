@@ -4,8 +4,8 @@
 #SBATCH --error             train_ddsm.log
 #SBATCH --nodes             1
 #SBATCH --ntasks-per-node   1
-#SBATCH --cpus-per-task     1
-#SBATCH --mem-per-cpu       8G
+#SBATCH --cpus-per-task     4
+#SBATCH --mem               8G
 #SBATCH --partition         skylake-gpu
 #SBATCH --gres              gpu:1
 #SBATCH --time              30:00
@@ -20,7 +20,7 @@ cd "/fred/oz121/repos/end2end-all-conv/"
 
 export PYTHONPATH=$PYTHONPATH:"/fred/oz121/repos/end2end-all-conv/"
 
-export NUM_CPU_CORES=8
+export NUM_CPU_CORES=4
 
 TRAIN_DIR="data/curated_breast_imaging_ddsm/train_dat_mod/train"
 VAL_DIR="data/curated_breast_imaging_ddsm/train_dat_mod/val"
@@ -30,7 +30,7 @@ BEST_MODEL="saved_model/ddsm/3cls_best_model.h5"
 FINAL_MODEL="saved_model/ddsm/3cls_final_model.h5"
 # FINAL_MODEL="NOSAVE"
 
-srun python ddsm_train/patch_clf_train.py \
+srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/patch_clf_train.py" \
 	--img-size 256 256 \
     --img-scale 255.0 \
 	--featurewise-center \

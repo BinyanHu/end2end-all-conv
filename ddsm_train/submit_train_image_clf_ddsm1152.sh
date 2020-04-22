@@ -1,13 +1,34 @@
 #!/bin/bash
+#SBATCH --job-name          train_ddsm1152
+#SBATCH --output            train_ddsm1152.log
+#SBATCH --error             train_ddsm1152.log
+#SBATCH --nodes             1
+#SBATCH --ntasks-per-node   1
+#SBATCH --cpus-per-task     4
+#SBATCH --mem               8G
+#SBATCH --partition         skylake-gpu
+#SBATCH --gres              gpu:1
+#SBATCH --time              30:00
+
+
+module load openmpi/4.0.0
+module load cudnn/7.0.5-cuda-9.0.176
+
+source activate py2
+
+cd "/fred/oz121/repos/end2end-all-conv/"
+
+export PYTHONPATH=$PYTHONPATH:"/fred/oz121/repos/end2end-all-conv/"
+
+export NUM_CPU_CORES=4
 
 TRAIN_DIR="data/curated_breast_imaging_ddsm/Combined_full_images/full_train_1152x896"
 VAL_DIR="data/curated_breast_imaging_ddsm/Combined_full_images/full_val_1152x896"
 TEST_DIR="data/curated_breast_imaging_ddsm/Combined_full_images/full_test_1152x896"
 PATCH_STATE="saved_model/ddsm/3cls_best_model.h5"
 BEST_MODEL="saved_model/ddsm/Combined_full_images/resnet_1152x896_prt_addtop1_best.h5"
-FINAL_MODEL="NOSAVE"
-
-export NUM_CPU_CORES=4
+FINAL_MODEL="saved_model/ddsm/Combined_full_images/resnet_1152x896_prt_addtop1_final.h5"
+# FINAL_MODEL="NOSAVE"
 
 srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/image_clf_train.py" \
     --patch-model-state $PATCH_STATE \
