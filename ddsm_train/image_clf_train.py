@@ -39,6 +39,15 @@ def run(train_dir, val_dir, test_dir, patch_model_state=None, resume_from=None,
         final_model="NOSAVE"):
     '''Train a deep learning model for image classifications
     '''
+    
+    if best_model != "NOSAVE":
+        best_model_dir = os.path.dirname(best_model)
+        if not os.path.exists(best_model_dir):
+            os.makedirs(best_model_dir)
+    if final_model != "NOSAVE":
+        final_model_dir = os.path.dirname(final_model)
+        if not os.path.exists(final_model):
+            os.makedirs(final_model_dir)
 
     # ======= Environmental variables ======== #
     random_seed = int(os.getenv('RANDOM_SEED', 12345))

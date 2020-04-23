@@ -107,8 +107,6 @@ def read_img_for_pred(fname, equalize_hist=False, data_format='channels_last',
                       transformer=None, standardizer=None, **kwargs):
     '''Read an image and prepare it for prediction through a network
     '''
-    print fname
-    print kwargs
     img = read_resize_img(fname, **kwargs)
     if equalize_hist:
         img = cv2.equalizeHist(img.astype('uint8'))
