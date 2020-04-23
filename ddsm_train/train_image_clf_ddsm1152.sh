@@ -9,7 +9,8 @@ FINAL_MODEL="NOSAVE"
 
 export NUM_CPU_CORES=4
 
-srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/image_clf_train.py" \
+# 255/65535 = 0.003891.
+"/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/image_clf_train.py" \
     --patch-model-state $PATCH_STATE \
     --no-resume-from \
     --img-size 1152 896 \
