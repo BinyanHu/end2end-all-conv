@@ -46,7 +46,7 @@ def run(train_dir, val_dir, test_dir, patch_model_state=None, resume_from=None,
             os.makedirs(best_model_dir)
     if final_model != "NOSAVE":
         final_model_dir = os.path.dirname(final_model)
-        if not os.path.exists(final_model):
+        if not os.path.exists(final_model_dir):
             os.makedirs(final_model_dir)
 
     # ======= Environmental variables ======== #
