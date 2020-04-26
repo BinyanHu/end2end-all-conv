@@ -11,17 +11,20 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "data/curated_breast_imaging_ddsm/mass_case_description_train_set.csv",
-                "data/curated_breast_imaging_ddsm/Mass-Training ROI and Cropped Images/",
-                "data/curated_breast_imaging_ddsm/Mass-Training Full Mammogram Images/",
-                // "data/curated_breast_imaging_ddsm/Combined_full_images/full_train_1152x896",
-                // "data/curated_breast_imaging_ddsm/Combined_full_images/full_val_1152x896",
-                "data/curated_breast_imaging_ddsm/Combined_full_images/full_test_1152x896",
-                "data/curated_breast_imaging_ddsm/Combined_full_images/_folder_that_will_not_be_created",
-                "--val-size=0",
-                "--target-height=1152",
-                "--target-width=896",
-                "--patch-size=0",
+                "data/curated_breast_imaging_ddsm/calc_case_description_train_set.csv",
+                "data/curated_breast_imaging_ddsm/Calc-Training ROI and Cropped Images/",
+                "data/curated_breast_imaging_ddsm/Calc-Training Full Mammogram Images/",
+                "data/curated_breast_imaging_ddsm/train_dat_mod/train",
+                "data/curated_breast_imaging_ddsm/train_dat_mod/val",
+                // "data/curated_breast_imaging_ddsm/calc_case_description_test_set.csv",
+                // "data/curated_breast_imaging_ddsm/Calc-Test ROI and Cropped Images/",
+                // "data/curated_breast_imaging_ddsm/Calc-Test Full Mammogram Images/",
+                // "data/curated_breast_imaging_ddsm/train_dat_mod/test",
+                // "data/curated_breast_imaging_ddsm/train_dat_mod/_folder_that_will_not_be_created",
+                // "--val-size=0",
+                "--nb-bkg=1",
+                "--nb-abn=1",
+                "--nb-hns=1"
             ]
         }
     ]

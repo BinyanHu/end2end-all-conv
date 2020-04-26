@@ -25,7 +25,7 @@ def get_image_and_mask(
     target_width
 ):
     token_list = []
-    token_list.append(("Calc" if abn_type == "calc" else "Mass") + "-" + split)
+    token_list.append(("Calc" if abn_type == "calcification" else "Mass") + "-" + split)
     token_list.extend([patient_id, side, view])
 
     # get image directory
@@ -140,18 +140,18 @@ def create_blob_detector(roi_size=(128, 128), blob_min_area=3,
 
 def sample_patches(image, roi_mask, out_dir, image_id, abn_id, pos, patch_size=256,
                    pos_cutoff=.75, neg_cutoff=.35,
-                   nb_bkg=100, nb_abn=100, start_sample_nb=0, abn_type="calc",
+                   nb_bkg=100, nb_abn=100, start_sample_nb=0, abn_type="calcification",
                    bkg_dir="background",
                    calc_pos_dir="calc_mal", calc_neg_dir="calc_ben",
                    mass_pos_dir="mass_mal", mass_neg_dir="mass_ben",
                    verbose=False):
     if pos:
-        if abn_type == "calc":
+        if abn_type == "calcification":
             roi_out = os.path.join(out_dir, calc_pos_dir)
         else:
             roi_out = os.path.join(out_dir, mass_pos_dir)
     else:
-        if abn_type == "calc":
+        if abn_type == "calcification":
             roi_out = os.path.join(out_dir, calc_neg_dir)
         else:
             roi_out = os.path.join(out_dir, mass_neg_dir)
