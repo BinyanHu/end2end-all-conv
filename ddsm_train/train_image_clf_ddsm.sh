@@ -5,8 +5,8 @@ VAL_DIR="data/curated_breast_imaging_ddsm/train_dat_mod/val"
 TEST_DIR="data/curated_breast_imaging_ddsm/train_dat_mod/test"
 #RESUME_FROM="saved_model/ddsm_patch/5cls_best_model.h5"
 BEST_MODEL="saved_model/ddsm_patch/5cls_best_model.h5"
-FINAL_MODEL="saved_model/ddsm_patch/5cls_final_model.h5"
-# FINAL_MODEL="NOSAVE"
+# FINAL_MODEL="saved_model/ddsm_patch/5cls_final_model.h5"
+FINAL_MODEL="NOSAVE"
 
 export NUM_CPU_CORES=4
 
@@ -20,11 +20,11 @@ python ddsm_train/patch_clf_train.py \
     --train-bs-multiplier 0.5 \
     --augmentation \
     --class-list background  calc_ben  calc_mal  mass_ben  mass_mal \
-    --nb-epoch 10 \
-    --top-layer-epochs 5 \
-    --all-layer-epochs 15 \
+    --nb-epoch 2 \
+    --top-layer-epochs 2 \
+    --all-layer-epochs 30 \
     --net resnet50 \
-    --optimizer nadam \
+    --optimizer adam \
     --use-pretrained \
     --no-top-layer-nb \
     --nb-init-filter 64 \
@@ -32,14 +32,14 @@ python ddsm_train/patch_clf_train.py \
     --init-conv-stride 2 \
     --max-pooling-size 3 \
     --max-pooling-stride 2 \
-    --weight-decay 0.01 \
+    --weight-decay 0.001 \
     --weight-decay2 0.0001 \
     --alpha 0.0001 \
     --l1-ratio 0.0 \
     --inp-dropout 0.0 \
     --hidden-dropout 0.5 \
     --hidden-dropout2 0.0 \
-    --init-learningrate 0.001 \
+    --init-learningrate 0.01 \
     --top-layer-multiplier 0.01 \
     --all-layer-multiplier 0.0001 \
     --lr-patience 2 \

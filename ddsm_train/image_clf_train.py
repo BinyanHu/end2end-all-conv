@@ -40,10 +40,9 @@ def run(train_dir, val_dir, test_dir, patch_model_state=None, resume_from=None,
     '''Train a deep learning model for image classifications
     '''
     
-    if best_model != "NOSAVE":
-        best_model_dir = os.path.dirname(best_model)
-        if not os.path.exists(best_model_dir):
-            os.makedirs(best_model_dir)
+    best_model_dir = os.path.dirname(best_model)
+    if not os.path.exists(best_model_dir):
+        os.makedirs(best_model_dir)
     if final_model != "NOSAVE":
         final_model_dir = os.path.dirname(final_model)
         if not os.path.exists(final_model_dir):
