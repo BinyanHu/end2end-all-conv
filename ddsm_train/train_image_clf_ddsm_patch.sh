@@ -32,7 +32,7 @@ python ddsm_train/patch_clf_train.py \
     --init-conv-stride 2 \
     --max-pooling-size 3 \
     --max-pooling-stride 2 \
-    --weight-decay 0.001 \
+    --weight-decay 0.0001 \
     --weight-decay2 0.0001 \
     --alpha 0.0001 \
     --l1-ratio 0.0 \

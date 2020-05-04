@@ -528,6 +528,16 @@ def run(description_path, roi_mask_dir, image_dir,
                     # NOTE csv not reliable due to formatting error, and there are missing files.
                     # image_path = cur_desc["image file path"]
                     # mask_path = cur_desc["ROI mask file path"]
+                    image_id = "_".join([patient_id, side, view])
+                    pos = pathology.startswith("MALIGNANT")
+                    base_name = "_".join([image_id, str(abn_id)])
+                    file_name = base_name + ".png"
+                    full_path = os.path.join(pos_dir if pos else neg_dir, file_name)
+
+                    if os.path.exists(full_path):
+                        print "already exists:", full_path
+                        continue
+
                     try:
                         image, _ = get_image_and_mask(
                             split="Training" if ("train" in description_path) else "Test",
@@ -542,22 +552,13 @@ def run(description_path, roi_mask_dir, image_dir,
                             target_width=target_width
                         )
 
-                        image_id = "_".join([patient_id, side, view])
                         print "ID:%s, read image of size=%s" % (image_id, image.shape)
 
-                        pos = pathology.startswith("MALIGNANT")
-                        base_name = "_".join([image_id, str(abn_id)])
-                        file_name = base_name + ".png"
-                        full_path = os.path.join(pos_dir if pos else neg_dir, file_name)
-                        if os.path.exists(full_path):
-                            print "already exists:", full_path
-                        else:
-                            image = image.astype("int32")
-                            image = toimage(image, high=image.max(), low=image.min(), mode="I")
-                            # image = image.reshape((image.shape[0], image.shape[1], 1))
-                            # import pdb; pdb.set_trace()
-                            image.save(full_path)
-
+                        image = image.astype("int32")
+                        image = toimage(image, high=image.max(), low=image.min(), mode="I")
+                        # image = image.reshape((image.shape[0], image.shape[1], 1))
+                        # import pdb; pdb.set_trace()
+                        image.save(full_path)
                     except RuntimeError as exception:
                         print exception
 

@@ -31,16 +31,16 @@ FINAL_MODEL="saved_model/ddsm/3cls_final_model.h5"
 # FINAL_MODEL="NOSAVE"
 
 srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/patch_clf_train.py" \
-	--img-size 256 256 \
+    --img-size 256 256 \
     --img-scale 255.0 \
-	--featurewise-center \
+    --featurewise-center \
     --featurewise-mean 59.6 \
     --equalize-hist \
-	--batch-size 64 \
+    --batch-size 64 \
     --train-bs-multiplier 0.5 \
-	--augmentation \
-	--class-list background mass_mal mass_ben \
-	--nb-epoch 10 \
+    --augmentation \
+    --class-list background mass_mal mass_ben \
+    --nb-epoch 10 \
     --top-layer-epochs 5 \
     --all-layer-epochs 15 \
     --net resnet50 \
@@ -62,12 +62,12 @@ srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/patch_clf_train.py" 
     --init-learningrate 0.01 \
     --top-layer-multiplier 0.01 \
     --all-layer-multiplier 0.0001 \
-	--lr-patience 2 \
-	--es-patience 5 \
-	--no-resume-from \
-	--auto-batch-balance \
+    --lr-patience 2 \
+    --es-patience 5 \
+    --no-resume-from \
+    --auto-batch-balance \
     --pos-cls-weight 1.0 \
-	--neg-cls-weight 1.0 \
-	--best-model $BEST_MODEL \
-	--final-model $FINAL_MODEL \
-	$TRAIN_DIR $VAL_DIR $TEST_DIR	
+    --neg-cls-weight 1.0 \
+    --best-model $BEST_MODEL \
+    --final-model $FINAL_MODEL \
+    $TRAIN_DIR $VAL_DIR $TEST_DIR    
