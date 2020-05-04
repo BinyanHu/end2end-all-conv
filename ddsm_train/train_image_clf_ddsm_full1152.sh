@@ -3,8 +3,8 @@
 TRAIN_DIR="data/curated_breast_imaging_ddsm/Combined_full_images/full_train_1152x896"
 VAL_DIR="data/curated_breast_imaging_ddsm/Combined_full_images/full_val_1152x896"
 TEST_DIR="data/curated_breast_imaging_ddsm/Combined_full_images/full_test_1152x896"
-PATCH_STATE="saved_model/ddsm/3cls_best_model.h5"
-BEST_MODEL="saved_model/ddsm/Combined_full_images/resnet_1152x896_prt_addtop1_best.h5"
+PATCH_STATE="saved_model/ddsm_patch/5cls_best_model.h5"
+BEST_MODEL="saved_model/ddsm_full1152/resnet_1152x896_prt_addtop1_best.h5"
 FINAL_MODEL="NOSAVE"
 
 export NUM_CPU_CORES=4
