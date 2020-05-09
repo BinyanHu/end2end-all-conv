@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name          train_ddsm1152
-#SBATCH --output            train_ddsm1152.log
-#SBATCH --error             train_ddsm1152.log
+#SBATCH --job-name          ddsm_full1152
+#SBATCH --output            ddsm_full1152.log
+#SBATCH --error             ddsm_full1152.log
 #SBATCH --nodes             1
 #SBATCH --ntasks-per-node   1
 #SBATCH --cpus-per-task     4
