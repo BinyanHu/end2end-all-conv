@@ -21,7 +21,7 @@ python ddsm_train/patch_clf_train.py \
     --augmentation \
     --class-list background  calc_ben  calc_mal  mass_ben  mass_mal \
     --nb-epoch 2 \
-    --top-layer-epochs 2 \
+    --top-layer-epochs 5 \
     --all-layer-epochs 30 \
     --net resnet50 \
     --optimizer adam \
@@ -39,9 +39,9 @@ python ddsm_train/patch_clf_train.py \
     --inp-dropout 0.0 \
     --hidden-dropout 0.5 \
     --hidden-dropout2 0.0 \
-    --init-learningrate 0.01 \
-    --top-layer-multiplier 0.01 \
-    --all-layer-multiplier 0.0001 \
+    --init-learningrate 0.0001 \
+    --top-layer-multiplier 0.1 \
+    --all-layer-multiplier 0.1 \
     --lr-patience 2 \
     --es-patience 5 \
     --no-resume-from \

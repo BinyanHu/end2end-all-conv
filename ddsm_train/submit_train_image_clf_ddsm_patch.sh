@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name          train_ddsm
-#SBATCH --output            train_ddsm.log
-#SBATCH --error             train_ddsm.log
+#SBATCH --job-name          ddsm_patch
+#SBATCH --output            ddsm_patch.log
+#SBATCH --error             ddsm_patch.log
 #SBATCH --nodes             1
 #SBATCH --ntasks-per-node   1
 #SBATCH --cpus-per-task     4
@@ -20,15 +20,16 @@ cd "/fred/oz121/binyan/repos/end2end-all-conv/"
 
 export PYTHONPATH=$PYTHONPATH:"/fred/oz121/binyan/repos/end2end-all-conv/"
 
-export NUM_CPU_CORES=4
 
 TRAIN_DIR="data/curated_breast_imaging_ddsm/train_dat_mod/train"
 VAL_DIR="data/curated_breast_imaging_ddsm/train_dat_mod/val"
 TEST_DIR="data/curated_breast_imaging_ddsm/train_dat_mod/test"
-#RESUME_FROM="saved_model/ddsm/3cls_best_model.h5"
-BEST_MODEL="saved_model/ddsm/3cls_best_model.h5"
-FINAL_MODEL="saved_model/ddsm/3cls_final_model.h5"
-# FINAL_MODEL="NOSAVE"
+#RESUME_FROM="saved_model/ddsm_patch/5cls_best_model.h5"
+BEST_MODEL="saved_model/ddsm_patch/5cls_best_model.h5"
+# FINAL_MODEL="saved_model/ddsm_patch/5cls_final_model.h5"
+FINAL_MODEL="NOSAVE"
+
+export NUM_CPU_CORES=4
 
 srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/patch_clf_train.py" \
     --img-size 256 256 \
@@ -39,12 +40,12 @@ srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/patch_clf_train.py" 
     --batch-size 64 \
     --train-bs-multiplier 0.5 \
     --augmentation \
-    --class-list background mass_mal mass_ben \
-    --nb-epoch 10 \
+    --class-list background  calc_ben  calc_mal  mass_ben  mass_mal \
+    --nb-epoch 2 \
     --top-layer-epochs 5 \
-    --all-layer-epochs 15 \
+    --all-layer-epochs 30 \
     --net resnet50 \
-    --optimizer nadam \
+    --optimizer adam \
     --use-pretrained \
     --no-top-layer-nb \
     --nb-init-filter 64 \
@@ -52,16 +53,16 @@ srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/patch_clf_train.py" 
     --init-conv-stride 2 \
     --max-pooling-size 3 \
     --max-pooling-stride 2 \
-    --weight-decay 0.01 \
+    --weight-decay 0.0001 \
     --weight-decay2 0.0001 \
     --alpha 0.0001 \
     --l1-ratio 0.0 \
     --inp-dropout 0.0 \
     --hidden-dropout 0.5 \
     --hidden-dropout2 0.0 \
-    --init-learningrate 0.01 \
-    --top-layer-multiplier 0.01 \
-    --all-layer-multiplier 0.0001 \
+    --init-learningrate 0.0001 \
+    --top-layer-multiplier 0.1 \
+    --all-layer-multiplier 0.1 \
     --lr-patience 2 \
     --es-patience 5 \
     --no-resume-from \
