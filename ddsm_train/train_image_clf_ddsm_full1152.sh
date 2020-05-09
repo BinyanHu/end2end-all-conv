@@ -21,7 +21,7 @@ export NUM_CPU_CORES=4
     --no-equalize-hist \
     --top-depths 512 512 \
     --top-repetitions 3 3 \
-    --batch-size 20 \
+    --batch-size 2 \
     --train-bs-multiplier 0.5 \
     --augmentation \
     --class-list neg pos \
