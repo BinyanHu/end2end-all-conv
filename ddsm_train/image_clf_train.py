@@ -206,10 +206,15 @@ def run(train_dir, val_dir, test_dir, patch_model_state=None, resume_from=None,
     sys.stdout.flush()
     org_model.load_weights(best_model)
     print "Done."
-    # test_steps = int(test_generator.nb_sample/batch_size)
-    # test_res = image_model.evaluate_generator(
-    #     test_generator, test_steps, nb_worker=nb_worker, 
-    #     pickle_safe=True if nb_worker > 1 else False)
+    test_steps = int(test_generator.nb_sample/batch_size)
+    test_res = image_model.evaluate_generator(
+        test_generator, test_steps, nb_worker=nb_worker, 
+        pickle_safe=True if nb_worker > 1 else False)
+
+    print test_res
+    for name, value in zip(image_model.metric_names, test_res):
+        print name, ":", value
+
     test_auc = DMAucModelCheckpoint.calc_test_auc(
         test_generator, image_model, test_samples=test_samples)
     print "AUROC on test set:", test_auc
