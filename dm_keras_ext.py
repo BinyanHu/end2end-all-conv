@@ -309,8 +309,6 @@ def do_3stage_training(model, org_model, train_generator, validation_set,
         loss_history = []
         acc_history = []
     
-    keras.backend.clear_session()
-    
     # Stage 2: train only the top layers.
     if use_pretrained:
         print "top layer nb =", top_layer_nb
@@ -342,8 +340,6 @@ def do_3stage_training(model, org_model, train_generator, validation_set,
             acc_history = np.append(acc_history, hist.history['val_acc'])
         except KeyError:
             pass
-
-        keras.backend.clear_session()
 
         # Stage 3: train all layers.
         for layer in org_model.layers[:top_layer_nb]:
