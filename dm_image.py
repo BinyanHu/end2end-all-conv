@@ -1221,6 +1221,9 @@ class DMDirectoryIterator(Iterator):
                 target_size=self.target_size, target_scale=self.target_scale,
                 gs_255=self.gs_255, rescale_factor=self.rescale_factor)
             batch_x[i] = x
+            
+            # print for debugging
+            print x.mean(), "±", x.std()
         # optionally save augmented images to disk for debugging purposes
         if self.save_to_dir:
             for i in range(current_batch_size):

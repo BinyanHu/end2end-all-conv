@@ -212,8 +212,8 @@ def run(train_dir, val_dir, test_dir, patch_model_state=None, resume_from=None,
         pickle_safe=True if nb_worker > 1 else False)
 
     print test_res
-    for name, value in zip(image_model.metric_names, test_res):
-        print name, ":", value
+    # for name, value in zip(image_model.metric_names, test_res):
+    #     print name, ":", value
 
     test_auc = DMAucModelCheckpoint.calc_test_auc(
         test_generator, image_model, test_samples=test_samples)
