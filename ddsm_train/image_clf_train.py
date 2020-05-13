@@ -55,6 +55,7 @@ def run(train_dir, val_dir, test_dir, patch_model_state=None, resume_from=None,
 
     # ========= Image generator ============== #
     if featurewise_center:
+        print "Using feature-wise centering, mean:", featurewise_mean
         train_imgen = DMImageDataGenerator(featurewise_center=True)
         val_imgen = DMImageDataGenerator(featurewise_center=True)
         test_imgen = DMImageDataGenerator(featurewise_center=True)
@@ -143,9 +144,9 @@ def run(train_dir, val_dir, test_dir, patch_model_state=None, resume_from=None,
         validation_set = load_dat_ram(validation_set, validation_set.nb_sample)
         print "Done."; sys.stdout.flush()
 
-    print "Generating training samples for 10 steps:"
-    for i, (images, labels) in zip(range(10), train_generator):
-        print images.shape, images.mean(), "+-", images.std()
+    # print "Generating training samples for 10 steps:"
+    # for i, (images, labels) in zip(range(10), train_generator):
+    #     print images.shape, images.mean(), "+-", images.std()
 
     # ==================== Model training ==================== #
     # Do 2-stage training.

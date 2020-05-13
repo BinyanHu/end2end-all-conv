@@ -5,8 +5,8 @@ from keras.models import load_model
 from dm_image import read_resize_img, read_img_for_pred
 
 parser = argparse.ArgumentParser(description="DM image clf testing")
-parser.add_argument("resume_from", type=str)
 parser.add_argument("image_path", type=str)
+parser.add_argument("resume_from", type=str, default="saved_model/ddsm_full1152/resnet_1152x896_prt_addtop1_best.h5")
 # parser.add_argument("--rescale-factor", dest="rescale_factor", type=float, default=None)
 # parser.add_argument("--featurewise-mean", dest="featurewise_mean", type=float, default=52.16)
 
@@ -33,6 +33,8 @@ image = read_img_for_pred(
     rescale_factor=rescale_factor
 )
 
+print image.mean(), "+-", image.std()
+
 # image = read_resize_img(
 #     ARGS.image_path,
 #     (1152, 896),
@@ -40,8 +42,8 @@ image = read_img_for_pred(
 #     gs_255=False
 # )
 
-# image -= featurewise_mean
+image -= featurewise_mean
 
 pred = image.predict(image)
 
-print pred
+print "prediction:", pred

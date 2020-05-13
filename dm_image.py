@@ -132,7 +132,7 @@ def read_img_for_pred(fname, equalize_hist=False, data_format='channels_last',
     
     x = standardizer(x) if standardizer is not None else x
 
-    print "after standardize", img.mean(), "+-", img.std()
+    # print "after standardize", img.mean(), "+-", img.std()
 
     return x
 
