@@ -8,7 +8,7 @@
 #SBATCH --mem               8G
 #SBATCH --partition         skylake-gpu
 #SBATCH --gres              gpu:1
-#SBATCH --time              30:00
+#SBATCH --time              4:00:00
 
 
 module load openmpi/4.0.0
@@ -71,4 +71,4 @@ srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/patch_clf_train.py" 
     --neg-cls-weight 1.0 \
     --best-model $BEST_MODEL \
     --final-model $FINAL_MODEL \
-    $TRAIN_DIR $VAL_DIR $TEST_DIR    
+    $TRAIN_DIR $VAL_DIR $TEST_DIR

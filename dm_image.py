@@ -319,7 +319,6 @@ class DMImgListIterator(Iterator):
         super(DMImgListIterator, self).__init__(
             self.nb_sample, batch_size, shuffle, seed)
 
-
     def next(self):
         with self.lock:
             index_array, current_index, current_batch_size = next(self.index_generator)
@@ -1224,6 +1223,7 @@ class DMDirectoryIterator(Iterator):
             
             # print for debugging
             print x.mean(), "±", x.std()
+
         # optionally save augmented images to disk for debugging purposes
         if self.save_to_dir:
             for i in range(current_batch_size):
@@ -1233,6 +1233,7 @@ class DMDirectoryIterator(Iterator):
                                                                   hash=np.random.randint(1e4),
                                                                   format=self.save_format)
                 img.save(path.join(self.save_to_dir, fname))
+
         # build batch of labels
         if self.class_mode == 'sparse':
             batch_y = self.labels[index_array]
@@ -1245,11 +1246,13 @@ class DMDirectoryIterator(Iterator):
         else:
             return self.preprocess(batch_x)
         sparse_y = self.labels[index_array]
+
         if self.auto_batch_balance:
             batch_w = np.ones_like(sparse_y, dtype='float32')
             for uy in np.unique(sparse_y):
                 batch_w[sparse_y==uy] /= (sparse_y==uy).mean()
             return self.preprocess(batch_x), batch_y, batch_w
+
         return self.preprocess(batch_x), batch_y
 
 
