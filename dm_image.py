@@ -1222,7 +1222,7 @@ class DMDirectoryIterator(Iterator):
             batch_x[i] = x
             
             # print for debugging
-            print x.mean(), "土", x.std()
+            print x.mean(), "+-", x.std()
 
         # optionally save augmented images to disk for debugging purposes
         if self.save_to_dir:
