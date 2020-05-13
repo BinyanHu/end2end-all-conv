@@ -26,7 +26,7 @@ image = read_img_for_pred(
     image_path,
     equalize_hist=False,
     data_format="default",
-    dup_3_channels=False,
+    dup_3_channels=True,
     target_size=(1152, 896),
     target_scale=None,
     gs_255=None,
@@ -40,7 +40,7 @@ image = read_img_for_pred(
 #     gs_255=False
 # )
 
-image -= featurewise_mean
+# image -= featurewise_mean
 
 pred = image.predict(image)
 

@@ -108,6 +108,9 @@ def read_img_for_pred(fname, equalize_hist=False, data_format='channels_last',
     '''Read an image and prepare it for prediction through a network
     '''
     img = read_resize_img(fname, **kwargs)
+
+    # print "after reading", img.mean(), "+-", img.std()
+
     if equalize_hist:
         img = cv2.equalizeHist(img.astype('uint8'))
     nb_channel = 3 if dup_3_channels else 1        
@@ -124,7 +127,13 @@ def read_img_for_pred(fname, equalize_hist=False, data_format='channels_last',
             x[:,:,1] = img
             x[:,:,2] = img
     x = transformer(x) if transformer is not None else x
+    
+    # print "after transform", img.mean(), "+-", img.std()
+    
     x = standardizer(x) if standardizer is not None else x
+
+    print "after standardize", img.mean(), "+-", img.std()
+
     return x
 
 
@@ -1219,10 +1228,8 @@ class DMDirectoryIterator(Iterator):
                 standardizer=self.image_data_generator.standardize,
                 target_size=self.target_size, target_scale=self.target_scale,
                 gs_255=self.gs_255, rescale_factor=self.rescale_factor)
+
             batch_x[i] = x
-            
-            # print for debugging
-            print x.mean(), "+-", x.std()
 
         # optionally save augmented images to disk for debugging purposes
         if self.save_to_dir:

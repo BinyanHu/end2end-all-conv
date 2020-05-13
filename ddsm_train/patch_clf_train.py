@@ -53,6 +53,7 @@ def run(train_dir, val_dir, test_dir,
 
     # ========= Image generator ============== #
     if featurewise_center:
+        print "Using feature-wise centering, mean:", featurewise_mean
         train_imgen = DMImageDataGenerator(featurewise_center=True)
         val_imgen = DMImageDataGenerator(featurewise_center=True)
         test_imgen = DMImageDataGenerator(featurewise_center=True)
