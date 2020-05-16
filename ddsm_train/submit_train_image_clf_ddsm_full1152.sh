@@ -43,7 +43,7 @@ srun "/fred/oz121/anaconda/envs/py2/bin/python" "ddsm_train/image_clf_train.py" 
     --batch-size 2 \
     --train-bs-multiplier 0.5 \
     --augmentation \
-    --class-list neg pos \
+    --class-list neg calc mass \
     --patch-net resnet50 \
     --nb-epoch 1 \
     --all-layer-epochs 5 \
