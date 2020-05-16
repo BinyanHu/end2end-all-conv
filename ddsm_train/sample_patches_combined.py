@@ -46,7 +46,7 @@ def get_image_and_mask(
                     break
 
     if not image_path:
-        raise RuntimeError("Could not find the image file.")
+        raise RuntimeError("Can not find image file in {!r}.".format(image_dir))
 
     ori_image_shape = cv2.imread(image_path).shape[:2]
 
@@ -503,13 +503,15 @@ def run(description_path, roi_mask_dir, image_dir,
 
                     except RuntimeError as exception:
                         print exception
-
     else:
         def do_sampling(pat_df, out_dir):
-            pos_dir = os.path.join(out_dir, "pos")
+            calc_dir = os.path.join(out_dir, "calc")
+            mass_dir = os.path.join(out_dir, "mass")
             neg_dir = os.path.join(out_dir, "neg")
-            if not os.path.exists(pos_dir):
-                os.makedirs(pos_dir)
+            if not os.path.exists(calc_dir):
+                os.makedirs(calc_dir)
+            if not os.path.exists(mass_dir):
+                os.makedirs(mass_dir)
             if not os.path.exists(neg_dir):
                 os.makedirs(neg_dir)
 
@@ -529,10 +531,16 @@ def run(description_path, roi_mask_dir, image_dir,
                     # image_path = cur_desc["image file path"]
                     # mask_path = cur_desc["ROI mask file path"]
                     image_id = "_".join([patient_id, side, view])
-                    pos = pathology.startswith("MALIGNANT")
                     base_name = "_".join([image_id, str(abn_id)])
                     file_name = base_name + ".png"
-                    full_path = os.path.join(pos_dir if pos else neg_dir, file_name)
+                    if pathology.startswith("MALIGNANT"):
+                        if abn_type == "calcification":
+                            save_dir = calc_dir
+                        elif abn_type == "mass":
+                            save_dir = mass_dir
+                    else:
+                        save_dir = neg_dir
+                    full_path = os.path.join(save_dir, file_name)
 
                     if os.path.exists(full_path):
                         print "already exists:", full_path
@@ -562,14 +570,16 @@ def run(description_path, roi_mask_dir, image_dir,
                     except RuntimeError as exception:
                         print exception
 
+                    print ""
+
     print "Sampling for train set"
-    sys.stdout.flush()
+    print train_df
     do_sampling(train_df, train_out_dir)
     print "Done."
     #####
     if valid_size > 0:
         print "Sampling for val set"
-        sys.stdout.flush()
+        print valid_df
         do_sampling(valid_df, valid_out_dir)
         print "Done."
 
